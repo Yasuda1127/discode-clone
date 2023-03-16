@@ -6,8 +6,19 @@ import SidebarChannel from "./SidebarChannel";
 import MicIcon from "@mui/icons-material/Mic";
 import HeadphonesIcon from "@mui/icons-material/Headphones";
 import SettingsIcon from "@mui/icons-material/Settings";
+import { auth, db } from "../../firebase";
+import { useAppSelector } from "../../app/hooks";
+import {collection,query} from "firebase/firestore/lite"
 
 const Sidebar = () => {
+  const user = useAppSelector((state) => state.user)
+
+  const q = query(collection(db, "channels"))
+
+  // useEffect(() => {
+
+  // },[])
+
   return (
     <div>
       <div className="sidebar">
@@ -46,11 +57,11 @@ const Sidebar = () => {
 
             <div className="sidebarFooter">
               <div className="sidebarAccount">
-                <img src="./icon.png" alt="" />
+                <img src={user?.photo} alt="" onClick={() => auth.signOut()}/>
 
                 <div className="accountName">
-                  <h4>YasuCode</h4>
-                  <span>#4020</span>
+                  <h4>{user?.displayName}</h4>
+                  <span>#{user?.uid.substring(0,4)}</span>
                 </div>
               </div>
 
