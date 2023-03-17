@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./Sidebar.scss";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AddIcon from "@mui/icons-material/Add";
@@ -8,16 +8,40 @@ import HeadphonesIcon from "@mui/icons-material/Headphones";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { auth, db } from "../../firebase";
 import { useAppSelector } from "../../app/hooks";
-import {collection,query} from "firebase/firestore/lite"
+// import { collection, query } from "firebase/firestore/lite";
+import {
+  onSnapshot,
+  collection,
+  query,
+  DocumentData,
+} from "firebase/firestore";
+
+interface Channel {
+  id: string;
+  channel: DocumentData;
+}
 
 const Sidebar = () => {
-  const user = useAppSelector((state) => state.user)
+  const [channels, setChannels] = useState<Channel[]>([]);
 
-  const q = query(collection(db, "channels"))
+  const user = useAppSelector((state) => state.user);
 
-  // useEffect(() => {
+  const q = query(collection(db, "channels"));
 
-  // },[])
+  useEffect(() => {
+    onSnapshot(q, (querySnapshot) => {
+      const channelsResults: Channel[] = [];
+      querySnapshot.docs.forEach((doc) =>
+        // console.log(doc.id, doc.data()),
+        channelsResults.push({
+          id: doc.id,
+          channel: doc.data(),
+        })
+      );
+      // console.log(channelsResults);
+      setChannels(channelsResults)
+    });
+  }, []);
 
   return (
     <div>
@@ -49,19 +73,22 @@ const Sidebar = () => {
             </div>
 
             <div className="sidebarChannelList">
+              {channels.map((channel) => (
+                <SidebarChannel channel={channel} id={channel.id}/>
+              ))}
+              {/* <SidebarChannel />
               <SidebarChannel />
               <SidebarChannel />
-              <SidebarChannel />
-              <SidebarChannel />
+              <SidebarChannel /> */}
             </div>
 
             <div className="sidebarFooter">
               <div className="sidebarAccount">
-                <img src={user?.photo} alt="" onClick={() => auth.signOut()}/>
+                <img src={user?.photo} alt="" onClick={() => auth.signOut()} />
 
                 <div className="accountName">
                   <h4>{user?.displayName}</h4>
-                  <span>#{user?.uid.substring(0,4)}</span>
+                  <span>#{user?.uid.substring(0, 4)}</span>
                 </div>
               </div>
 
