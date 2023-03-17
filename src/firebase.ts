@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore/lite"; // インポートする
+import { getFirestore } from "firebase/firestore"; // インポートする
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 const firebaseConfig = {
