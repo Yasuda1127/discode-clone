@@ -8,40 +8,23 @@ import HeadphonesIcon from "@mui/icons-material/Headphones";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { auth, db } from "../../firebase";
 import { useAppSelector } from "../../app/hooks";
+import useCollection from "../../hooks/useCollection";
+import { addDoc, collection } from "firebase/firestore";
 // import { collection, query } from "firebase/firestore/lite";
-import {
-  onSnapshot,
-  collection,
-  query,
-  DocumentData,
-} from "firebase/firestore";
-
-interface Channel {
-  id: string;
-  channel: DocumentData;
-}
 
 const Sidebar = () => {
-  const [channels, setChannels] = useState<Channel[]>([]);
+  const user = useAppSelector((state) => state.user.user);
+  const { documents: channels } = useCollection("channels");
 
-  const user = useAppSelector((state) => state.user);
+  const addChannel = async () => {
+    let channelName: string | null = prompt("新しいチャンネルを作成します");
 
-  const q = query(collection(db, "channels"));
-
-  useEffect(() => {
-    onSnapshot(q, (querySnapshot) => {
-      const channelsResults: Channel[] = [];
-      querySnapshot.docs.forEach((doc) =>
-        // console.log(doc.id, doc.data()),
-        channelsResults.push({
-          id: doc.id,
-          channel: doc.data(),
-        })
-      );
-      // console.log(channelsResults);
-      setChannels(channelsResults)
-    });
-  }, []);
+    if (channelName) {
+      await addDoc(collection(db, "channels"), {
+        channelName: channelName,
+      });
+    }
+  };
 
   return (
     <div>
@@ -69,12 +52,19 @@ const Sidebar = () => {
                 <ExpandMoreIcon />
                 <h4>プログラミングチャンネル</h4>
               </div>
-              <AddIcon className="sidebarAddIcon" />
+              <AddIcon
+                className="sidebarAddIcon"
+                onClick={() => addChannel()}
+              />
             </div>
 
             <div className="sidebarChannelList">
               {channels.map((channel) => (
-                <SidebarChannel channel={channel} id={channel.id}/>
+                <SidebarChannel
+                  channel={channel}
+                  id={channel.id}
+                  key={channel.id}
+                />
               ))}
               {/* <SidebarChannel />
               <SidebarChannel />
