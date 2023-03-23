@@ -120,7 +120,7 @@ export default function Chat() {
         <form>
           <input
             type="text"
-            placeholder="#udemyへメッセージを送信"
+            placeholder="#メッセージを送信"
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setInputText(e.target.value)
             }
